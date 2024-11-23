@@ -4,11 +4,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
+const cors = require("cors"); // Add this line
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(cors()); // Add this line
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
