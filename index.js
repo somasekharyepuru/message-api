@@ -12,15 +12,16 @@ const port = process.env.PORT || 3000;
 
 app.use(cors()); // Add this line
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("Welcome to Geekyms API");
 });
 
-app.post("/send", async (req, res) => {
-  const { name, email, message } = req.body;
+app.post("/", async (req, res) => {
+  const { name, email, subject, message } = req.body;
 
-  if (!name || !email || !message) {
+  if (!name || !email || !subject) {
     return res.status(400).send("All fields are required");
   }
 
@@ -35,15 +36,16 @@ app.post("/send", async (req, res) => {
   const mailOptions = {
     from: email,
     to: process.env.MAIL_USERNAME,
-    subject: `Message from ${name} and email is ${email}`,
+    subject: `${subject} from ${name} <${email}>`,
     text: message,
   };
 
   try {
-    const data = await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
     res.status(200).send("Message sent successfully");
   } catch (error) {
-    res.status(500).send("Error sending message");
+    console.error("Email sending failed:", error);
+    res.status(500).send(`Error sending message: ${error.message}`);
   }
 });
 
